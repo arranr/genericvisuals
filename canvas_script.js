@@ -64,17 +64,63 @@ function draw(x, y) {
   lastY = y;
 }
 
-// Function to save the drawing
-function saveDrawing() {
-  const dataURL = canvas.toDataURL('image/jpeg');
-  const fileName = `drawing_${Date.now()}.jpg`;
-  const link = document.createElement('a');
-  link.href = dataURL;
-  link.download = fileName;
-  link.click();
-}
 
 // Function to clear the canvas
 function clearCanvas() {
   context.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+
+// Function to save the drawing
+// GitHub API configuration
+const username = 'arranr';
+const repository = 'genericvisuals';
+const token = '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';
+
+// Function to save the drawing as a JPEG image and upload it to GitHub
+function saveDrawing() {
+  // Convert the canvas to a data URL
+  const dataURL = canvas.toDataURL('image/jpeg');
+
+  // Create a file name for the image
+  const fileName = `drawing_${Date.now()}.jpg`;
+
+  // Create a file blob from the data URL
+  const fileBlob = dataURLtoBlob(dataURL);
+
+  // Create a FormData object
+  const formData = new FormData();
+  formData.append('file', fileBlob, fileName);
+
+  // Send the image file to GitHub repository using the GitHub API
+  $.ajax({
+    url: `https://api.github.com/repos/${username}/${repository}/contents/images/${fileName}`,
+    type: 'PUT',
+    beforeSend: function(xhr) {
+      xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+    },
+    data: JSON.stringify({
+      message: 'Upload image',
+      content: btoa(formData.get('file'))
+    })
+  })
+  .done(function(response) {
+    console.log('Drawing saved to GitHub repository');
+  })
+  .fail(function(error) {
+    console.error('Error saving drawing to GitHub repository:', error);
+  });
+}
+
+// Function to convert data URL to Blob
+function dataURLtoBlob(dataURL) {
+  const arr = dataURL.split(',');
+  const mime = arr[0].match(/:(.*?);/)[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new Blob([u8arr], { type: mime });
 }
