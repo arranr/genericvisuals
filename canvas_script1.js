@@ -85,46 +85,52 @@ const token = config.GITHUB_API_TOKEN; // Retrieve the API token from an environ
 
 // Function to save the drawing as a JPEG image and upload it to GitHub
 function saveDrawing() {
-    // Convert the canvas to a data URL
-    const dataURL = canvas.toDataURL('image/jpeg', 0.8);
-  
-    // Remove the "data:image/jpeg;base64," prefix from the data URL
-    const base64Data = dataURL.replace(/^data:image\/jpeg;base64,/, '');
-  
-    // Create a file name for the image
-    const fileName = `drawing_${Date.now()}.jpg`;
-  
-    // Create a blob from the base64 encoded data
-    const blob = b64toBlob(base64Data, 'image/jpeg');
-  
-    // Create a FormData object
-    const formData = new FormData();
-    formData.append('file', blob, fileName);
-  
-    // Send the image file to GitHub repository using the GitHub API
-    fetch(`https://api.github.com/repos/${username}/${repository}/contents/images/${fileName}`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'Accept': 'application/vnd.github.v3+json'
-      },
-      body: JSON.stringify({
-        message: 'Upload image',
-        content: base64Data
-      })
+  // Convert the canvas to a data URL
+  const dataURL = canvas.toDataURL('image/jpeg');
+
+  // Remove the "data:image/jpeg;base64," prefix from the data URL
+  const base64Data = dataURL.replace(/^data:image\/jpeg;base64,/, '');
+
+  // Create a file name for the image
+  const fileName = `drawing_${Date.now()}.jpeg`;
+
+  // Create a FormData object
+  const formData = new FormData();
+  formData.append('file', base64Data);
+
+  // Send the image file to GitHub repository using the GitHub API
+  $.ajax({
+    url: `https://api.github.com/repos/${username}/${repository}/contents/images/${fileName}`,
+    type: 'PUT',
+    beforeSend: function(xhr) {
+      xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+    },
+    data: JSON.stringify({
+      message: 'Upload image',
+      content: base64Data,
+      encoding: 'base64'
     })
-      .then(response => {
-        if (response.ok) {
-          console.log('Drawing saved to GitHub repository');
-        } else {
-          console.error('Error saving drawing to GitHub repository:', response.status);
-        }
-      })
-      .catch(error => {
-        console.error('Error saving drawing to GitHub repository:', error);
-      });
-  }
+  })
+    .done(function(response) {
+      console.log('Drawing saved to GitHub repository');
+
+      // Clear the canvas and set white background
+      clearCanvas();
+    })
+    .fail(function(error) {
+      console.error('Error saving drawing to GitHub repository:', error);
+    });
+}
+
+// Function to clear the canvas and set white background
+function clearCanvas() {
+  // Set the canvas background color to white
+  context.fillStyle = '#FFFFFF';
+  context.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Clear the canvas
+  context.clearRect(0, 0, canvas.width, canvas.height);
+}
   
   // Function to convert base64 to Blob
   function b64toBlob(b64Data, contentType = '', sliceSize = 512) {
