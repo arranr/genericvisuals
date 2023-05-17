@@ -4,6 +4,9 @@ let context = canvas.getContext('2d');
 let lastX, lastY;
 let isDrawing = false;
 
+context.fillStyle = 'rgba(0, 0, 0, 0)';
+context.fillRect(0, 0, canvas.width, canvas.height);
+
 // Event listener for mouse movements
 canvas.addEventListener('mousedown', function(event) {
   isDrawing = true;
@@ -49,6 +52,13 @@ document.addEventListener('mouseup', function() {
   isDrawing = false;
 });
 
+
+// Function to clear the canvas
+function clearCanvas() {
+  context.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+
 // Function to draw on the canvas
 function draw(x, y) {
   context.beginPath();
@@ -64,33 +74,30 @@ function draw(x, y) {
   lastY = y;
 }
 
-
-// Function to clear the canvas
-function clearCanvas() {
-  context.clearRect(0, 0, canvas.width, canvas.height);
-}
-
-
 // Function to save the drawing
 // GitHub API configuration
 const username = 'arranr';
 const repository = 'genericvisuals';
-const token = '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';
+//const token = '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';
+const token = config.GITHUB_API_TOKEN; // Retrieve the API token from an environment variable
 
 // Function to save the drawing as a JPEG image and upload it to GitHub
 function saveDrawing() {
   // Convert the canvas to a data URL
   const dataURL = canvas.toDataURL('image/jpeg');
 
+// Remove the "data:image/jpeg;base64," prefix from the data URL
+const base64Data = dataURL.replace(/^data:image\/jpeg;base64,/, '');
+
   // Create a file name for the image
-  const fileName = `drawing_${Date.now()}.jpg`;
+  const fileName = `drawing_${Date.now()}.jpeg`;
 
   // Create a file blob from the data URL
   const fileBlob = dataURLtoBlob(dataURL);
 
   // Create a FormData object
   const formData = new FormData();
-  formData.append('file', fileBlob, fileName);
+  formData.append('file', base64Data);
 
   // Send the image file to GitHub repository using the GitHub API
   $.ajax({
@@ -101,7 +108,10 @@ function saveDrawing() {
     },
     data: JSON.stringify({
       message: 'Upload image',
-      content: btoa(formData.get('file'))
+      //content: btoa(formData.get('file'))
+      content: base64Data,
+      encoding: 'base64' // Specify the encoding as base64
+   
     })
   })
   .done(function(response) {
@@ -111,6 +121,10 @@ function saveDrawing() {
     console.error('Error saving drawing to GitHub repository:', error);
   });
 }
+
+
+
+
 
 // Function to convert data URL to Blob
 function dataURLtoBlob(dataURL) {
