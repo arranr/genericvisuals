@@ -12,13 +12,8 @@
         // Parse the CSV data
         const parsedData = d3.csvParseRows(data);
 
-        // Extract the words from the specified column
-        //const words = parsedData.map(row => row[3]);
-        const words = parsedData.map(row => [row[3], row[4], row[5]]);
-
-
-
-        [row[3], row[4], row[5]]
+        // Extract the words from the specified columns
+        const words = parsedData.flatMap(row => [row[3], row[4], row[5]]);
 
         // Count the occurrences of each word
         const wordCountMap = new Map();
@@ -44,11 +39,9 @@
 
         layout.start();
 
-        
-
         // Draw the word cloud
         function draw(words) {
-            const colorScale = d3.scaleOrdinal(d3.schemeCategory10); // Define a color scale
+          const colorScale = d3.scaleOrdinal(d3.schemeCategory10); // Define a color scale
 
           d3.select("body")
             .append("svg")
@@ -61,7 +54,6 @@
             .enter()
             .append("text")
             .style("font-size", d => d.size + "px")
-            //.style("fill", "#000")
             .style("fill", () => colorScale(Math.floor(Math.random() * 10))) // Assign a random color
             .attr("text-anchor", "middle")
             .attr("transform", d => "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")")
