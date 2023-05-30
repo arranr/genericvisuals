@@ -1,0 +1,17 @@
+#word-cloud {
+    width: 800px;
+    height: 600px;
+    position: relative;
+}
+
+.word {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.word img {
+    max-width: 100%;
+    max-height: 100%;
+}
