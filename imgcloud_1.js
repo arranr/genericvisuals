@@ -13,7 +13,7 @@ fetch(csvURL)
 
         // Count the frequency of each number in column C
         values.forEach(columns => {
-            const number = parseInt(columns[2]);
+            const number = parseInt(columns[1]);
             if (frequencyMap[number]) {
                 frequencyMap[number]++;
             } else {
@@ -40,7 +40,7 @@ fetch(csvURL)
 // Function to create the image word cloud
 function createWordCloud(images) {
     const width = 800;
-    const height = 500;
+    const height = 533;
 
     const svg = d3.select('#word-cloud')
         .append('svg')
