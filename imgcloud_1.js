@@ -40,7 +40,7 @@ fetch(csvURL)
 // Function to create the image word cloud
 function createWordCloud(images) {
     const width = 800;
-    const height = 533;
+    const height = 500;
 
     const svg = d3.select('#word-cloud')
         .append('svg')
