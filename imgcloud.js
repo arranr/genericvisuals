@@ -25,7 +25,7 @@ fetch(csvURL)
         const images = Object.keys(frequencyMap).map(number => {
             const frequency = frequencyMap[number];
             return {
-                url: `wordcloudimages/${number}.png`,
+                url: `wordcloudimages/${number}.jpg`,
                 frequency: frequency
             };
         });
