@@ -15,6 +15,8 @@
         // Extract the words from the specified columns
         const words = parsedData.flatMap(row => [row[3], row[4], row[5]]);
 
+console.log(words)
+
         // Count the occurrences of each word
         const wordCountMap = new Map();
         words.forEach(word => {
